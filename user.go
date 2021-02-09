@@ -89,6 +89,42 @@ func (r *UserResource) AddAttribute(userid string, data map[string]interface{}) 
 	return
 }
 
+// Track enables events and user actions to be tracked
+func (r *UserResource) Track(userid string, data interface{}) (trackResponse map[string]interface{}, err error) {
+	var payload map[string]interface{}
+
+	if userid == "" {
+		return nil, errNoAttributeUser
+	}
+
+	if data == nil {
+		return nil, errNoAttributeData
+	}
+
+	// validate and prepare payload
+	switch data.(type) {
+	case string:
+		payload = map[string]interface{}{
+			"event": data,
+			"value": true,
+		}
+	case map[string]interface{}:
+		payload = data.(map[string]interface{})
+	default:
+		return nil, errNoAttributeData
+	}
+
+	endpoint := fmt.Sprintf("/users/%s/events", userid)
+	resp, err := r.client.putRequest(endpoint, payload)
+	if err != nil {
+		return
+	}
+
+	err = resp.ParseJSON(&trackResponse)
+
+	return
+}
+
 func indexOf(word string, data []string) int {
 	for k, v := range data {
 		if word == v {
