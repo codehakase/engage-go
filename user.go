@@ -33,7 +33,7 @@ func (r *UserResource) Identify(data map[string]interface{}) (identifyResp map[s
 	}
 
 	if _, ok := data["id"]; !ok {
-		return nil, errInvalidOrMissingEmail
+		return nil, errInvalidOrMissingID
 	}
 
 	if _, ok := data["email"]; !ok || !re.MatchString(data["email"].(string)) {

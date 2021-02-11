@@ -29,6 +29,11 @@ var (
 	errNoAPIKey = errors.New("API key not set")
 )
 
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // resource represents a shared resource struct
 type resource struct {
 	client *Client
@@ -36,7 +41,7 @@ type resource struct {
 
 // Client represents the Engage Client
 type Client struct {
-	client *http.Client
+	client HTTPClient
 
 	// The Engage API key
 	key string
@@ -86,6 +91,11 @@ func New(key, secret string) (*Client, error) {
 // ParseJSON ...
 func (r *HTTPResponse) ParseJSON(v interface{}) error {
 	return json.Unmarshal(r.Data, v)
+}
+
+// SetClient updates the HTTP client
+func (c *Client) SetClient(client HTTPClient) {
+	c.client = client
 }
 
 func (c *Client) postRequest(endpoint string, body interface{}) (*HTTPResponse, error) {
